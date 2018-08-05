@@ -22,7 +22,7 @@ function setupAccessory(acc, lampService) {
     let lamp = acc.context.lamp;
 
     function get_prop(characteristic, name) {
-        return (callback) => callback(lamp[name]);
+        return (callback) => callback(null, lamp[name]);
     }
 
     function set_prop(characteristic, name) {
