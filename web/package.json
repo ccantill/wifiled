@@ -1,0 +1,14 @@
+{
+  "name": "wifiledweb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "webinterface.js",
+  "scripts": {
+    "run": "node node_modules/http-server/bin/http-server"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "http-server": "^0.11.1"
+  }
+}
