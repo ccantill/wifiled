@@ -112,7 +112,7 @@ module.exports = function (homebridge) {
                         console.log("Service gone", service);
                         if(service.name in this.accessories) {
                             let acc = this.accessories[service.name];
-                            acc.updateReachability(true);
+                            acc.updateReachability(false);
                         }
                     });
 
@@ -124,7 +124,6 @@ module.exports = function (homebridge) {
         configureAccessory(accessory) {
             setupAccessory(accessory, accessory.getService(Service.Lightbulb));
             this.accessories[accessory.context.name] = accessory;
-            accessory.updateReachability(true);
         }
     }
 
