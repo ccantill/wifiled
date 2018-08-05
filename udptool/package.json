@@ -1,0 +1,11 @@
+{
+  "name": "wifiled",
+  "version": "1.0.0",
+  "description": "Control program for WiFi Leds",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

@@ -36,11 +36,11 @@ function loadMain() {
             let c = parseHexToObject(this.value);
             if (c) {
                 color = c;
-                fetch(`/led?r=${c.r}&g=${c.g}&b=${c.b}`);
+                fetch(`/rgb?r=${c.r}&g=${c.g}&b=${c.b}`);
             }
         },
         "setDefault.click": function () {
-            fetch(`/led?r=${color.r}&g=${color.g}&b=${color.b}&default=true`);
+            fetch(`/rgb?r=${color.r}&g=${color.g}&b=${color.b}&default=true`);
         }
     });
 }

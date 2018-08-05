@@ -93,9 +93,7 @@ void restoreDefaultColor() {
   setColor(color);
 }
 
-void handleSetLed() {
-  String r_str = httpServer.arg("r");
-  String g_str = httpServer.arg("g");
+void handleSetRgb() {
   int r,g,b;
   if(
     sscanf(httpServer.arg("r").c_str(), "%d", &r) == 1 &&
@@ -118,6 +116,35 @@ void handleSetLed() {
   }
 }
 
+void handleSetHsv() {
+  int h,s,v;
+  if(
+    sscanf(httpServer.arg("h").c_str(), "%d", &h) == 1 &&
+    sscanf(httpServer.arg("s").c_str(), "%d", &s) == 1 &&
+    sscanf(httpServer.arg("v").c_str(), "%d", &v) == 1)
+  {
+    CRGB color = CHSV(h,s,v);
+    if(httpServer.hasArg("default")) {
+      setDefaultColor(color);
+    } else {
+      setColor(color);
+    }
+    httpServer.send(200, "text/plain", "OK");
+  } else {
+    httpServer.send(400, "text/plain", "Invalid Request");
+  }
+}
+
+void handleTurnOff() {
+  setColor(CRGB::Black);
+  httpServer.send(200, "text/plain", "OK");
+}
+
+void handleTurnOn() {
+  restoreDefaultColor();
+  httpServer.send(200, "text/plain", "OK");
+}
+
 // Checks the magic number at EEPROM address 0 and clears the EEPROM if it's not right
 void initEeprom() {
   int magicNumber;
@@ -132,6 +159,9 @@ void initEeprom() {
 }
 
 void setup() {
+  String hostname = "WL-" + String(ESP.getChipId(), HEX);
+  WiFi.hostname(hostname);
+  
   Serial.begin(115200);
   FastLED.addLeds<NEOPIXEL, 2>(leds, numberOfLeds);
   
@@ -146,11 +176,14 @@ void setup() {
   httpUpdater.setup(&httpServer);
   httpServer.on("/", handleRoot);
   httpServer.on("/dev", handleDevRoot);
-  httpServer.on("/led", handleSetLed);
+  httpServer.on("/rgb", handleSetRgb);
+  httpServer.on("/hsv", handleSetHsv);
+  httpServer.on("/off", handleTurnOff);
+  httpServer.on("/on",  handleTurnOn);
 
   httpServer.begin();
 
-  if (MDNS.begin("wifiled")) {
+  if (MDNS.begin(hostname.c_str())) {
     MDNS.addService("wifiled", "udp", udpPort);
     MDNS.addService("http", "tcp", 80);
   }
