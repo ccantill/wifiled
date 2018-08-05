@@ -1,27 +1,48 @@
 var fragments = {
-    "main": "<form action=\"/led\">\n" +
-    "    <label for=\"r\">Red</label>\n" +
-    "    <input type=\"number\" \"min\"=\"0\" \"max\"=\"255\" name=\"r\" value=\"255\" />\n" +
-    "    <br/>" +
-    "    <label for=\"g\">Green</label>\n" +
-    "    <input type=\"number\" \"min\"=\"0\" \"max\"=\"255\" name=\"g\" value=\"255\" />\n" +
-    "    <br/>" +
-    "    <label for=\"b\">Blue</label>\n" +
-    "    <input type=\"number\" \"min\"=\"0\" \"max\"=\"255\" name=\"b\" value=\"255\" />\n" +
-    "    <br/>" +
-    "    <input type=\"checkbox\" name=\"default\" value=\"default\" /><label for=\"default\"> Set as default color</label>" +
-    "    <br/>" +
-    "    <input type=\"submit\" value=\"Set\" />\n" +
-    "</form>"
+    "main": () => `
+                <label for="r">Color</label>
+                <input type="color" name="color" id="color"/><br/>
+                <input type="button" id="setDefault" value="Set as default" />
+`
 };
 
-function setFragment(name) {
-    var body = document.querySelector("body");
-    body.innerHTML = fragments[name];
+function parseHexToObject(hex) {
+    let [c, r, g, b] = hex.match(/#([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})/);
+    if (c != hex) return;
+
+    return {
+        r: Number.parseInt(r, 16),
+        g: Number.parseInt(g, 16),
+        b: Number.parseInt(b, 16)
+    };
 }
 
+function setFragment(name, events, ...args) {
+    var body = document.querySelector("body");
+    body.innerHTML = fragments[name](...args);
+    Object.keys(events).forEach(k => {
+            let [id, eventname] = k.split('.');
+            let element = document.getElementById(id);
+            element.addEventListener(eventname, events[k].bind(element));
+        }
+    )
+}
+
+let color;
+
 function loadMain() {
-    setFragment("main");
+    setFragment("main", {
+        "color.change": function () {
+            let c = parseHexToObject(this.value);
+            if (c) {
+                color = c;
+                fetch(`/led?r=${c.r}&g=${c.g}&b=${c.b}`);
+            }
+        },
+        "setDefault.click": function () {
+            fetch(`/led?r=${color.r}&g=${color.g}&b=${color.b}&default=true`);
+        }
+    });
 }
 
 document.addEventListener('DOMContentLoaded', loadMain);
